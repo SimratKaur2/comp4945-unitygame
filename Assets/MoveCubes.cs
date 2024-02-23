@@ -10,7 +10,7 @@ public class MoveCubes : MonoBehaviour
 
     public GameObject localCube, remoteCube;
     public Vector3 localCubePos = new Vector3(4.0f, 1.0f, -0.5f);
-    public Vector3 remoteCubePos = new Vector3(-4.0f, 1.0f, -0.5f);
+    //public Vector3 remoteCubePos = new Vector3(-4.0f, 1.0f, -0.5f);
 
     void Start()
     {
@@ -22,7 +22,7 @@ public class MoveCubes : MonoBehaviour
         remoteCube = GameObject.Find("RemoteCube");
         localCube = GameObject.Find("LocalCube");
         localCube.transform.position = localCubePos;
-        remoteCube.transform.position = remoteCubePos;
+        //remoteCube.transform.position = remoteCubePos;
     }
 
     IEnumerator ConnectToWebSocketServer()
@@ -35,6 +35,11 @@ public class MoveCubes : MonoBehaviour
         StartCoroutine(StartReceivingMessages());
     }
 
+    private bool hasNewPosition = false;
+    private Vector3 pendingRemoteCubePosition;
+    public float speed = 5.0f; // You can adjust this value as needed
+
+
     IEnumerator StartReceivingMessages()
     {
         var receiveTask = networkComm.ReceiveMessages();
@@ -44,7 +49,18 @@ public class MoveCubes : MonoBehaviour
     {
         HandleInput();
         //MoveRemoteCube();
-        UpdateCubePositions();
+        //UpdateCubePositions();
+
+        // Smoothly move the remote cube towards the new position
+        if (hasNewPosition)
+        {
+            remoteCube.transform.position = Vector3.MoveTowards(remoteCube.transform.position, pendingRemoteCubePosition, speed * Time.deltaTime);
+            if (remoteCube.transform.position == pendingRemoteCubePosition)
+            {
+                // Once the cube has reached the target position, reset the flag
+                hasNewPosition = false;
+            }
+        }
     }
     //void MoveRemoteCube()
     //{
@@ -81,56 +97,6 @@ public class MoveCubes : MonoBehaviour
             }
         }
     }
-
-
-    void UpdateCubePositions()
-    {
-        localCube.transform.position = localCubePos;
-        remoteCube.transform.position = remoteCubePos;
-    }
-
-
-    //void ProcessMsg(string message)
-    //{
-    //    Debug.Log($"Message Received: {message}");
-
-    //    // Split the received message by semicolon
-    //    string[] msgParts = message.Split(';');
-
-    //    // Handling SETID message
-    //    if (msgParts[0] == "SETID")
-    //    {
-    //        // Parse and set the local client ID
-    //        localClientId = int.Parse(msgParts[1]);
-    //        Debug.Log($"Local client ID set to {localClientId}");
-    //    }
-    //    // Handling UPDATE message
-    //    else if (msgParts[0] == "UPDATE")
-    //    {
-    //        // Parse the sender ID from the message
-    //        int senderId = int.Parse(msgParts[1]);
-
-    //        // Check if the sender ID is 2, indicating the message is for the remote cube
-    //        if (senderId == 2) // Assuming ID 2 is for the remote cube
-    //        {
-    //            // Split the coordinate part of the message and parse each coordinate
-    //            string[] coords = msgParts[2].Split(',');
-    //            float x = float.Parse(coords[0]);
-    //            float y = float.Parse(coords[1]);
-    //            float z = float.Parse(coords[2]);
-
-    //            // Update the remote cube's position on the main thread
-    //            UnityMainThreadDispatcher.Instance().Enqueue(() =>
-    //            {
-    //                if (remoteCube != null)
-    //                {
-    //                    remoteCube.transform.position = new Vector3(x, y, z);
-    //                }
-    //            });
-    //        }
-    //    }
-    //}
-
     void ProcessMsg(string message)
     {
         Debug.Log("Received message: " + message); // Confirm the message is received
@@ -142,29 +108,11 @@ public class MoveCubes : MonoBehaviour
             float x = float.Parse(coords[0], CultureInfo.InvariantCulture);
             float y = float.Parse(coords[1], CultureInfo.InvariantCulture);
             float z = float.Parse(coords[2], CultureInfo.InvariantCulture);
-            remoteCube.transform.position = new Vector3(x, y, z); // Update the position
 
-            UnityMainThreadDispatcher.Instance().Enqueue(() =>
-            {
-                //remoteCube.transform.position = new Vector3(x, y, z); // Update the position
-                Debug.Log($"Remote cube moved to: {remoteCube.transform.position}"); // Confirm the cube's position
-                Debug.Log($"Is the cube visible? {remoteCube.GetComponent<Renderer>().isVisible}");
+            // Store the received position
+            pendingRemoteCubePosition = new Vector3(x, y, z);
+            hasNewPosition = true; // Indicate that there's a new target position
 
-            });
         }
     }
-
-
-
-    //public void ThreadFunction()
-    //{
-    //    float x = 1.0f, y = 1.0f, z = 1.0f;
-    //    while (true)
-    //    {
-    //        Thread.Sleep(1000); // Simulate receiving position updates
-    //        string simulatedMessage = $"ID=2;{x},{y},{z}";
-    //        ProcessMsg(simulatedMessage);
-    //        x += 0.1f; y += 0.1f; z += 0.1f; // Simulate changing positions
-    //    }
-    //}
 }
