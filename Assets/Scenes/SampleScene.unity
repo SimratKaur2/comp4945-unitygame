@@ -180,7 +180,7 @@ GameObject:
   - component: {fileID: 447439360}
   - component: {fileID: 447439359}
   m_Layer: 0
-  m_Name: Cube1
+  m_Name: RemoteCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -391,10 +391,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7584150dfb949a4fae636783a48126a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localCube: {fileID: 447439358}
-  remoteCube: {fileID: 833956504}
-  localCubePos: {x: 0, y: 0, z: 0}
-  remoteCubePos: {x: 0, y: 0, z: 0}
+  localCube: {fileID: 833956504}
+  remoteCube: {fileID: 447439358}
+  localCubePos: {x: -4, y: 0.5, z: -0.5}
+  remoteCubePos: {x: 4, y: 0.5, z: -0.5}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -519,7 +519,7 @@ GameObject:
   - component: {fileID: 833956506}
   - component: {fileID: 833956505}
   m_Layer: 0
-  m_Name: Cube2
+  m_Name: LocalCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
