@@ -28,7 +28,7 @@ public class MoveCubes : MonoBehaviour
     IEnumerator ConnectToWebSocketServer()
     {
         // Replace "ws://yourwebsocketserver.com" with your actual WebSocket server URI
-        var connectTask = networkComm.ConnectToServer("ws://localhost:3000");
+        var connectTask = networkComm.ConnectToServer("ws://172.20.10.2:3000");
         yield return new WaitUntil(() => connectTask.IsCompleted);
 
         // Once connected, start receiving messages
@@ -87,7 +87,7 @@ public class MoveCubes : MonoBehaviour
                 localCube.transform.position = localCubePos;
 
                 // Serialize the position to a string format "POS;x,y,z"
-                string message = $"POS;{localCubePos.x.ToString()},{localCubePos.y.ToString()},{localCubePos.z.ToString()}";
+                string message = $"ID=3;{localCubePos.x.ToString()},{localCubePos.y.ToString()},{localCubePos.z.ToString()}";
 
                 // Send the updated position to the server
                 networkComm.SendMessage(message);
